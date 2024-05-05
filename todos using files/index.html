@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body onload="onLoad()">
+   <!-- <form onsubmit="onPress()"> -->
+    Todo Title : 
+    <input type="text" id="title"><br><br>
+    Todo Description : 
+    <input type="text" id="description"><br> <br>
+    <button type = "submit" onclick="onPress()">send todo</button>
+   <!-- </form> -->
+    <div class="container">
+
+    </div>
+
+    <script>
+        
+        function deleteTodo(id){
+            fetch('http://localhost:3000/todos/' + id , {
+                method : 'DELETE', 
+                headers : {
+                    "Content-Type" : "application/json",
+                }
+            }).then(()=>{
+                console.log("Done Delete!!");
+                let deletedChild = document.getElementById(id);
+                deletedChild.remove();
+            });
+        }
+
+        function onPress(){
+            let title  = document.getElementById('title').value;
+            let description = document.getElementById('description').value;
+            fetch("http://localhost:3000/todos",{
+                // method : "GET",
+                method : 'POST',
+                body : JSON.stringify({
+                    title : title,
+                    description : description
+                }),
+                headers : {
+                    "Content-Type" : "application/json",
+                }
+            })
+            .then(result => result.json())
+            .then(result => {
+                let containerItem = document.querySelector('.container');
+                let div = document.createElement('div');
+
+                    let title = document.createElement('span');
+                    title.innerHTML = result.title;
+
+                    let description = document.createElement('span');
+                    description.innerHTML = result.description;
+
+                    let deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML ='Delete';
+                    deleteBtn.setAttribute('onclick' , 'deleteTodo(' + result.id + ')');
+                    div.setAttribute('id' ,result.id );
+
+                    let span = document.createElement('span');
+                    span.innerHTML = " : "
+
+                    div.appendChild(title);
+                    div.appendChild(span);
+                    div.appendChild(description);
+                    div.appendChild(deleteBtn);
+
+                    containerItem.appendChild(div);
+                    // let br = document.createElement('br');
+                    // containerItem.appendChild(br);
+            } );
+        }
+
+        function onLoad(){
+            fetch('http://localhost:3000/todos' , {
+                method : 'GET'
+            })
+            .then(result => result.json())
+            .then(result => {
+                let containerItem = document.querySelector('.container');
+                
+                for(let i=0;i<result.length;i++){
+                    let div = document.createElement('div');
+
+                    let title = document.createElement('span');
+                    title.innerHTML = result[i].title;
+
+                    let description = document.createElement('span');
+                    description.innerHTML = result[i].description;
+
+                    let deleteBtn = document.createElement('button');
+                    deleteBtn.innerHTML ='Delete';
+
+                    let span = document.createElement('span');
+                    span.innerHTML = " : "
+
+                    div.appendChild(title);
+                    div.appendChild(span);
+                    div.appendChild(description);
+                    div.appendChild(deleteBtn);
+
+                    containerItem.appendChild(div);
+                    // let br = document.createElement('br');
+                    // containerItem.appendChild(br);
+                }
+            });
+        }
+    </script>
+</body>
+</html>
